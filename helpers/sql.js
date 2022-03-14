@@ -28,4 +28,29 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-module.exports = { sqlForPartialUpdate };
+/**
+ * Convert optional search filters into SQL-syntax
+ *
+ *
+ */
+
+function sqlForCompanyFilter(dataToUpdate) {
+  const colKeys = {
+    name: "lower(name) LIKE lower('%' || $1 || '%')",
+    minEmployees: `"num_employees" >=$*`,
+    maxEmployees: `"num_employees" <=$*`
+  };
+  const keys = Object.keys(dataToUpdate);
+  const cols = keys.map((colName, idx) => {
+    return `${colKeys[colName]}`.replace("*", idx + 1);
+  });
+  console.log(`setCols: ${cols.join(" AND ")}`);
+  console.log(`values: ${Object.values(dataToUpdate)}`);
+
+  return {
+    setCols: cols.join(" AND "),
+    values: Object.values(dataToUpdate)
+  };
+}
+
+module.exports = { sqlForPartialUpdate, sqlForCompanyFilter };
