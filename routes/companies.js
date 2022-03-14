@@ -8,6 +8,7 @@ const express = require("express");
 const { BadRequestError } = require("../expressError");
 const { ensureLoggedIn } = require("../middleware/auth");
 const Company = require("../models/company");
+const { preValidateProperty } = require("../helpers/validation");
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
@@ -55,7 +56,10 @@ router.get("/", async function (req, res, next) {
   let companies;
   try {
     if (hasParams) {
-      const validator = jsonschema.validate(req.query, companySearchSchema);
+      // Uses a Pre-Property Validation Hook to cast numerical strings => integers
+      const validator = jsonschema.validate(req.query, companySearchSchema, {
+        preValidateProperty
+      });
       if (!validator.valid) {
         const errs = validator.errors.map((e) => e.stack);
         throw new BadRequestError(errs);
