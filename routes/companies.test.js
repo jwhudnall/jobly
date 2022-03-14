@@ -63,7 +63,7 @@ describe("POST /companies", function () {
   });
 });
 
-/************************************** GET /companies */
+/************************************** GET /companies (no query params) */
 
 describe("GET /companies - no params", function () {
   test("ok for anon", async function () {
@@ -105,6 +105,8 @@ describe("GET /companies - no params", function () {
   });
 });
 
+/************************************** GET /companies (with query params) */
+
 describe("GET /companies (with one or more params)", function () {
   test("Filters companies by 3 params", async () => {
     const query = { name: "c", minEmployees: 1, maxEmployees: 2 };
@@ -123,7 +125,6 @@ describe("GET /companies (with one or more params)", function () {
     const resp = await request(app).get("/companies").query(query);
     expect(resp.statusCode).toEqual(200);
     expect(resp.body.companies.length).toEqual(2);
-    console.log(resp.body);
   });
   test("Invalid data type throws error", async () => {
     const query = { maxEmployees: "something" };

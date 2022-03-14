@@ -56,9 +56,8 @@ router.get("/", async function (req, res, next) {
   let companies;
   try {
     if (hasParams) {
-      // Uses a Pre-Property Validation Hook to cast numerical strings => integers
       const validator = jsonschema.validate(req.query, companySearchSchema, {
-        preValidateProperty
+        preValidateProperty // Pre-Property Validation Hook to cast numerical strings => integers
       });
       if (!validator.valid) {
         const errs = validator.errors.map((e) => e.stack);
