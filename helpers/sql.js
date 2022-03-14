@@ -31,10 +31,10 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 /**
  * Translate company search filters into SQL-syntax
  *
- * @param {*} dataToUpdate - Object of key:value pairs
+ * @param {*} dataToUpdate - Object of key:value pairs by which the query should be filtered.
  * @returns - Object {
  *              setCols: SQL-compatible variable string of columns to be filtered
- *              values: Array of values to be passed in alongside setCols string. }
+ *              values: Array of values relating to the 'setCols' string. }
  */
 
 function sqlForCompanyFilter(dataToUpdate) {
