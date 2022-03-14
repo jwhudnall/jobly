@@ -5,8 +5,8 @@ const { BadRequestError } = require("../expressError");
  * the specified values.
  * Optionally converts keys to match columns within the database.
  *
- * @param {*} dataToUpdate - Object of key:value pairs of information to be updated.
- * @param {*} jsToSql  - Object of key:value pairs converting JS syntax to match that found in the db.
+ * @param {*} dataToUpdate - Object of key:value pairs
+ * @param {*} jsToSql  - Object of key:value pairs converting JS syntax to match cols found in the db.
  * @returns - Object {
  *              setCols: SQL-compatible variable string of columns to be updated.
  *              values: Array of values to be passed in alongside setCols string. }
@@ -29,9 +29,12 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 }
 
 /**
- * Convert optional search filters into SQL-syntax
+ * Translate company search filters into SQL-syntax
  *
- *
+ * @param {*} dataToUpdate - Object of key:value pairs
+ * @returns - Object {
+ *              setCols: SQL-compatible variable string of columns to be filtered
+ *              values: Array of values to be passed in alongside setCols string. }
  */
 
 function sqlForCompanyFilter(dataToUpdate) {
