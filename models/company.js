@@ -47,13 +47,12 @@ class Company {
     const querySql = `SELECT handle,
                   name,
                   description,
-                  num_employees,
-                  logo_url
+                  num_employees AS "numEmployees",
+                  logo_url AS "logoUrl"
            FROM companies
            WHERE ${setCols}
            ORDER BY name`;
     const result = await db.query(querySql, [...values]);
-
     return result.rows;
   }
 

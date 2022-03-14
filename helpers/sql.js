@@ -47,8 +47,6 @@ function sqlForCompanyFilter(dataToUpdate) {
   const cols = keys.map((colName, idx) => {
     return `${colKeys[colName]}`.replace("*", idx + 1);
   });
-  console.log(`setCols: ${cols.join(" AND ")}`);
-  console.log(`values: ${Object.values(dataToUpdate)}`);
 
   return {
     setCols: cols.join(" AND "),
