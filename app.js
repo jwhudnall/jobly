@@ -25,7 +25,6 @@ app.use("/auth", authRoutes);
 app.use("/companies", companiesRoutes);
 app.use("/users", usersRoutes);
 
-
 /** Handle 404 errors -- this matches everything */
 app.use(function (req, res, next) {
   return next(new NotFoundError());
@@ -38,7 +37,7 @@ app.use(function (err, req, res, next) {
   const message = err.message;
 
   return res.status(status).json({
-    error: { message, status },
+    error: { message, status }
   });
 });
 
