@@ -12,7 +12,7 @@ function preValidateProperty(object, key, schema, options, ctx) {
   ) {
     // If the type is "number" but the instance is not a number, cast it
     if (schema.type === "number" && typeof value !== "number") {
-      object[key] = parseFloat(value);
+      object[key] = parseInt(value);
       return;
     }
   }
