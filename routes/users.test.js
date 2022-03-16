@@ -210,28 +210,32 @@ describe("GET /users", function () {
           firstName: "U1F",
           lastName: "U1L",
           email: "user1@user.com",
-          isAdmin: false
+          isAdmin: false,
+          jobs: []
         },
         {
           username: "u2",
           firstName: "U2F",
           lastName: "U2L",
           email: "user2@user.com",
-          isAdmin: false
+          isAdmin: false,
+          jobs: []
         },
         {
           username: "u3",
           firstName: "U3F",
           lastName: "U3L",
           email: "user3@user.com",
-          isAdmin: false
+          isAdmin: false,
+          jobs: []
         },
         {
           username: "u4",
           firstName: "U4F",
           lastName: "U4L",
           email: "user4@user.com",
-          isAdmin: true
+          isAdmin: true,
+          jobs: []
         }
       ]
     });

@@ -105,6 +105,14 @@ describe("register", function () {
 /************************************** findAll */
 
 describe("findAll", function () {
+  let testJob;
+
+  beforeEach(async () => {
+    const allJobs = await Job.findAll();
+    testJob = allJobs[0];
+    await User.apply("u1", testJob.id);
+  });
+
   test("works", async function () {
     const users = await User.findAll();
     expect(users).toEqual([
@@ -113,14 +121,16 @@ describe("findAll", function () {
         firstName: "U1F",
         lastName: "U1L",
         email: "u1@email.com",
-        isAdmin: false
+        isAdmin: false,
+        jobs: [testJob.id]
       },
       {
         username: "u2",
         firstName: "U2F",
         lastName: "U2L",
         email: "u2@email.com",
-        isAdmin: false
+        isAdmin: false,
+        jobs: []
       }
     ]);
   });
@@ -233,7 +243,6 @@ describe("apply", function () {
   beforeEach(async () => {
     const allJobs = await Job.findAll();
     testJob = allJobs[0];
-    console.log(`testJob: ${testJob.id}`);
   });
 
   test("works", async () => {
@@ -245,7 +254,6 @@ describe("apply", function () {
     try {
       Promise.all([await User.apply("u1", testJob.id), await User.apply("u1", testJob.id)]);
     } catch (err) {
-      console.log(err);
       expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
@@ -253,7 +261,6 @@ describe("apply", function () {
     try {
       await User.apply("u1", testJob.id);
     } catch (err) {
-      console.log(err);
       expect(err instanceof BadRequestError).toBeTruthy();
     }
   });

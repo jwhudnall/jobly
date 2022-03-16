@@ -23,7 +23,6 @@ describe("create", function () {
     equity: 0.01,
     company_handle: "c1"
   };
-  console.log(`newJob CREATED! ${JSON.stringify(newJob)}`);
 
   test("works", async function () {
     let job = await Job.create(newJob);

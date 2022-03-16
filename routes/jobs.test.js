@@ -195,7 +195,6 @@ describe("PATCH /companies/:handle", function () {
   });
 
   test("works for admins", async function () {
-    console.log(`testJob info: ${JSON.stringify(testJob)}`);
     const resp = await request(app)
       .patch(`/jobs/${testJob.id}`)
       .send({

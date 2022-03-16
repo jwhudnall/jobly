@@ -6,6 +6,7 @@ const { sqlForPartialUpdate } = require("../helpers/sql");
 const { NotFoundError, BadRequestError, UnauthorizedError } = require("../expressError");
 
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
+const { user } = require("pg/lib/defaults");
 
 /** Related functions for users. */
 
@@ -121,9 +122,35 @@ class User {
     return user;
   }
 
+  /** Find all job ids related to each user within given 'usernames' array.
+   *
+   * usernames: Array of valid usernames
+   * returns: Object of username:job Array Ids
+   *          ex: {user1: [43, 55], user2: []}
+   **/
+
+  static async findUserJobIds(usernames) {
+    const jobData = {};
+    for (let user of usernames) {
+      const res = await db.query(
+        `SELECT job_id
+          FROM applications
+          WHERE username=$1`,
+        [user]
+      );
+      if (res.rows.length === 0) {
+        jobData[user] = [];
+      } else {
+        jobData[user] = res.rows.map((j) => j.job_id);
+      }
+    }
+    return jobData;
+  }
+
   /** Find all users.
    *
-   * Returns [{ username, first_name, last_name, email, is_admin }, ...]
+   * Returns [{ username, first_name, last_name, email, is_admin, jobs:[] }, ...]
+   *   where jobs represents the job ids for any applications to which the user has applied.
    **/
 
   static async findAll() {
@@ -136,8 +163,18 @@ class User {
            FROM users
            ORDER BY username`
     );
+    const users = result.rows;
+    const usernames = users.map((u) => u.username);
+    const jobData = await User.findUserJobIds(usernames);
 
-    return result.rows;
+    return result.rows.map((u) => ({
+      username: u.username,
+      firstName: u.firstName,
+      lastName: u.lastName,
+      email: u.email,
+      isAdmin: u.isAdmin,
+      jobs: jobData[u.username]
+    }));
   }
 
   /** Given a username, return data about user.
