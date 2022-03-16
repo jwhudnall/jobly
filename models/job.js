@@ -28,6 +28,23 @@ class Job {
 
     return job;
   }
+
+  /** Find jobs by company handle
+   *
+   * @param {*} handle - matches existing company_handle within database
+   * @returns - Array of matching jobs.
+   */
+
+  static async findByHandle(handle) {
+    const jobs = await db.query(
+      `SELECT id, title, salary, equity
+      FROM jobs
+      WHERE company_handle=$1`,
+      [handle]
+    );
+    return jobs.rows;
+  }
+
   /** Find jobs based on filtered search.
    *
    *
