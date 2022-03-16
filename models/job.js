@@ -31,7 +31,7 @@ class Job {
   /** Find jobs based on filtered search.
    *
    *
-   * Allowed query parameter filters: 'title', 'minSalary', 'hasEquity'
+   * Allowed 'data' query parameters: 'title', 'minSalary', 'hasEquity'
    * Uses helper function 'sqlForFilteredSearch' to generate a SQL-ready string by which
    * companies are filtered.
    *   - if 'hasEquity' is false (or not included), 'equity' filter is ignored.
@@ -86,14 +86,18 @@ class Job {
   }
 
   /** Given a job id, return data about job.
+   * - Throws NotFoundError if:
+   *    - id cannot be cast to a number
+   *    - job not found.
    *
-   * Returns { handle, name, description, numEmployees, logoUrl, jobs }
-   *   where jobs is [{ id, title, salary, equity, companyHandle }, ...]
+   * Returns { id title, salary, equity, companyHandle }
    *
-   * Throws NotFoundError if not found.
    **/
 
   static async get(id) {
+    if (isNaN(parseInt(id))) {
+      throw new NotFoundError("company id should be a number");
+    }
     const jobRes = await db.query(
       `SELECT id,
                   title,
@@ -151,6 +155,9 @@ class Job {
    **/
 
   static async remove(id) {
+    if (isNaN(parseInt(id))) {
+      throw new NotFoundError("company id should be a number");
+    }
     const result = await db.query(
       `DELETE
            FROM jobs

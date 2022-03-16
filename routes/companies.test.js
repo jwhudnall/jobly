@@ -177,7 +177,7 @@ describe("GET /companies/:handle", function () {
 /************************************** PATCH /companies/:handle */
 
 describe("PATCH /companies/:handle", function () {
-  test("works for users", async function () {
+  test("works for admins", async function () {
     const resp = await request(app)
       .patch(`/companies/c1`)
       .send({
@@ -195,12 +195,20 @@ describe("PATCH /companies/:handle", function () {
     });
   });
 
+  test("unauth for users", async function () {
+    const resp = await request(app)
+      .patch(`/companies/c1`)
+      .send({
+        name: "C1-new"
+      })
+      .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(401);
+  });
+
   test("unauth for anon", async function () {
     const resp = await request(app).patch(`/companies/c1`).send({
       name: "C1-new"
     });
-    console.log(`************ resp.body:`);
-    console.log(resp.body);
     expect(resp.statusCode).toEqual(401);
   });
 
@@ -224,7 +232,7 @@ describe("PATCH /companies/:handle", function () {
     expect(resp.statusCode).toEqual(400);
   });
 
-  test("bad request on invalid data", async function () {
+  test("bad request for invalid data type", async function () {
     const resp = await request(app)
       .patch(`/companies/c1`)
       .send({
@@ -238,19 +246,25 @@ describe("PATCH /companies/:handle", function () {
 /************************************** DELETE /companies/:handle */
 
 describe("DELETE /companies/:handle", function () {
+  test("works for admin", async function () {
+    const resp = await request(app)
+      .delete(`/companies/c1`)
+      .set("authorization", `Bearer ${u4AdminToken}`);
+    expect(resp.statusCode).toEqual(200);
+  });
+
   test("results in unauthorized for users", async function () {
     const resp = await request(app)
       .delete(`/companies/c1`)
       .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(401);
-    // expect(resp.body).toEqual({ deleted: "c1" });
   });
 
   test("unauth for anon", async function () {
     const resp = await request(app).delete(`/companies/c1`);
     expect(resp.statusCode).toEqual(401);
   });
-  // Change to admin
+
   test("not found for no such company", async function () {
     const resp = await request(app)
       .delete(`/companies/nope`)

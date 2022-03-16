@@ -48,5 +48,5 @@
       "examples": ["c1"]
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

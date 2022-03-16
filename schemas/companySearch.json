@@ -39,5 +39,5 @@
       "examples": [4]
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

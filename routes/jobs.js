@@ -72,10 +72,8 @@ router.get("/", async function (req, res, next) {
         throw new BadRequestError(errs);
       }
       jobs = await Job.findFiltered(req.query);
-      console.log(`Params! Jobs found: ${JSON.stringify(jobs)}`);
     } else {
       jobs = await Job.findAll();
-      console.log(`No Params. Jobs found: ${JSON.stringify(jobs)}`);
     }
     return res.json({ jobs });
   } catch (err) {
@@ -114,6 +112,7 @@ router.get("/:id", async function (req, res, next) {
 router.patch("/:id", ensureIsAdmin, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, jobUpdateSchema);
+
     if (!validator.valid) {
       const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
@@ -131,7 +130,7 @@ router.patch("/:id", ensureIsAdmin, async function (req, res, next) {
  * Authorization: admin
  */
 
-router.delete("/:id", async function (req, res, next) {
+router.delete("/:id", ensureIsAdmin, async function (req, res, next) {
   try {
     await Job.remove(req.params.id);
     return res.json({ deleted: req.params.id });
