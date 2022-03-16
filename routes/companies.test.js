@@ -36,9 +36,6 @@ describe("POST /companies", function () {
       .send(newCompany)
       .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(401);
-    // expect(resp.body).toEqual({
-    //   company: newCompany
-    // });
   });
   test("success for admin", async function () {
     const resp = await request(app)
@@ -46,9 +43,6 @@ describe("POST /companies", function () {
       .send(newCompany)
       .set("authorization", `Bearer ${u4AdminToken}`);
     expect(resp.statusCode).toEqual(201);
-    // expect(resp.body).toEqual({
-    //   company: newCompany
-    // });
   });
 
   test("bad request with missing data", async function () {

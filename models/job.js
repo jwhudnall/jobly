@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate, sqlForCompanyFilter } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlForFilteredSearch } = require("../helpers/sql");
 
 /** Related functions for jobs. */
 
@@ -30,12 +30,41 @@ class Job {
   }
   /** Find jobs based on filtered search.
    *
+   *
+   * Allowed query parameter filters: 'title', 'minSalary', 'hasEquity'
+   * Uses helper function 'sqlForFilteredSearch' to generate a SQL-ready string by which
+   * companies are filtered.
+   *   - if 'hasEquity' is false (or not included), 'equity' filter is ignored.
+   *
    * Returns [{ id, title, salary, equity, company_handle }, ...]
    */
 
   static async findFiltered(data) {
-    // TODO: implement later
-    return;
+    const colKeys = {
+      title: "lower(title) LIKE lower('%' || $1 || '%')",
+      minSalary: `"salary" >=$*`,
+      hasEquity: `"equity" > 0`
+    };
+
+    let { setCols, values } = sqlForFilteredSearch(data, colKeys);
+
+    if (setCols.includes("equity") && data.hasEquity === false) {
+      setCols = setCols.replace(`AND "equity" > 0`, "");
+      setCols = setCols.replace(`"equity" > 0`, "");
+    }
+    values = values.filter((v) => typeof v !== "boolean");
+
+    const querySql = `SELECT id,
+                  title,
+                  salary,
+                  equity,
+                  company_handle AS "companyHandle"
+           FROM jobs
+           WHERE ${setCols}
+           ORDER BY title`;
+
+    const result = await db.query(querySql, [...values]);
+    return result.rows;
   }
 
   /** Find all jobs.

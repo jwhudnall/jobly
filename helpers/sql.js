@@ -37,12 +37,12 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  *              values: Array of values relating to the 'setCols' string. }
  */
 
-function sqlForCompanyFilter(dataToUpdate) {
-  const colKeys = {
-    name: "lower(name) LIKE lower('%' || $1 || '%')",
-    minEmployees: `"num_employees" >=$*`,
-    maxEmployees: `"num_employees" <=$*`
-  };
+function sqlForFilteredSearch(dataToUpdate, colKeys) {
+  // const colKeys = {
+  //   name: "lower(name) LIKE lower('%' || $1 || '%')",
+  //   minEmployees: `"num_employees" >=$*`,
+  //   maxEmployees: `"num_employees" <=$*`
+  // };
   const keys = Object.keys(dataToUpdate);
   const cols = keys.map((colName, idx) => {
     return `${colKeys[colName]}`.replace("*", idx + 1);
@@ -54,4 +54,21 @@ function sqlForCompanyFilter(dataToUpdate) {
   };
 }
 
-module.exports = { sqlForPartialUpdate, sqlForCompanyFilter };
+// function sqlForJobFilter(dataToUpdate, colKeys) {
+//   const colKeys = {
+//     title: "lower(name) LIKE lower('%' || $1 || '%')",
+//     minSalary: `"salary" >=$*`,
+//     hasEquity: `"equity" >0`
+//   };
+//   const keys = Object.keys(dataToUpdate);
+//   const cols = keys.map((colName, idx) => {
+//     return `${colKeys[colName]}`.replace("*", idx + 1);
+//   });
+
+//   return {
+//     setCols: cols.join(" AND "),
+//     values: Object.values(dataToUpdate)
+//   };
+// }
+
+module.exports = { sqlForPartialUpdate, sqlForFilteredSearch };

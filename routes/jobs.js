@@ -10,7 +10,6 @@ const { ensureLoggedIn, ensureIsAdmin } = require("../middleware/auth");
 const Job = require("../models/job");
 const Company = require("../models/company");
 const { preValidateProperty } = require("../helpers/validation");
-const { sqlForPartialUpdate } = require("../helpers/sql");
 
 const jobNewSchema = require("../schemas/jobNew.json");
 const jobUpdateSchema = require("../schemas/jobUpdate.json");
@@ -21,7 +20,7 @@ const router = new express.Router();
 
 /** POST / { job } =>  { job }
  *
- * job should be { title, salary, equity, company_handle }
+ * job req body should be { title, salary, equity, companyHandle }
  *
  * Returns { id, title, salary, equity, company_handle }
  * Natively returns NotFoundError (via 'Company' model) if invalid companyHandle is passed.
@@ -73,8 +72,10 @@ router.get("/", async function (req, res, next) {
         throw new BadRequestError(errs);
       }
       jobs = await Job.findFiltered(req.query);
+      console.log(`Params! Jobs found: ${JSON.stringify(jobs)}`);
     } else {
       jobs = await Job.findAll();
+      console.log(`No Params. Jobs found: ${JSON.stringify(jobs)}`);
     }
     return res.json({ jobs });
   } catch (err) {

@@ -38,6 +38,7 @@ async function commonBeforeAll() {
            ('Jr. Programmer', 80000, 0, 'c2' )
     `
   );
+  console.log(`********** 2 Jobs Added!`);
 }
 
 async function commonBeforeEach() {

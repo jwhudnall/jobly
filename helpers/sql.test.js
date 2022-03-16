@@ -1,7 +1,11 @@
-const { sqlForPartialUpdate, sqlForCompanyFilter } = require("./sql");
+const { sqlForPartialUpdate, sqlForFilteredSearch } = require("./sql");
 
 const data = { name: "ABC", description: "description", numEmployees: 3 };
-const filteredSearch = {};
+const colKeys = {
+  name: "lower(name) LIKE lower('%' || $1 || '%')",
+  minEmployees: `"num_employees" >=$*`,
+  maxEmployees: `"num_employees" <=$*`
+};
 
 describe("Update data", () => {
   test("Updates with no key transformations", () => {
@@ -28,7 +32,7 @@ describe("Update data", () => {
 describe("Filtered Company search", () => {
   test("Converts all 3 params", () => {
     const params = { name: "abc", minEmployees: 3, maxEmployees: 10 };
-    result = sqlForCompanyFilter(params);
+    result = sqlForFilteredSearch(params, colKeys);
     expect(result).toHaveProperty("setCols");
     expect(result).toHaveProperty("values");
     expect(result.setCols.match(/AND/g).length).toBe(2);
@@ -36,7 +40,7 @@ describe("Filtered Company search", () => {
   });
   test("Converts search with 2 params", () => {
     const params = { minEmployees: 3, maxEmployees: 10 };
-    result = sqlForCompanyFilter(params);
+    result = sqlForFilteredSearch(params, colKeys);
     expect(result).toHaveProperty("setCols");
     expect(result).toHaveProperty("values");
     expect(result.setCols.match(/AND/g).length).toBe(1);
@@ -44,7 +48,7 @@ describe("Filtered Company search", () => {
   });
   test("Converts search with 1 params", () => {
     const params = { maxEmployees: 10 };
-    result = sqlForCompanyFilter(params);
+    result = sqlForFilteredSearch(params, colKeys);
     expect(result).toHaveProperty("setCols");
     expect(result).toHaveProperty("values");
     expect(result.values).toEqual([10]);

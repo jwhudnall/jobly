@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate, sqlForCompanyFilter } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlForFilteredSearch } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -43,7 +43,13 @@ class Company {
    */
 
   static async findFiltered(data) {
-    const { setCols, values } = sqlForCompanyFilter(data);
+    const colKeys = {
+      name: "lower(name) LIKE lower('%' || $1 || '%')",
+      minEmployees: `"num_employees" >=$*`,
+      maxEmployees: `"num_employees" <=$*`
+    };
+    const { setCols, values } = sqlForFilteredSearch(data, colKeys);
+
     const querySql = `SELECT handle,
                   name,
                   description,

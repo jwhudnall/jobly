@@ -1,7 +1,6 @@
 "use strict";
 const db = require("../db.js");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { update } = require("./job");
 const Job = require("./job");
 const {
   commonBeforeAll,
@@ -24,6 +23,7 @@ describe("create", function () {
     equity: 0.01,
     company_handle: "c1"
   };
+  console.log(`newJob CREATED! ${JSON.stringify(newJob)}`);
 
   test("works", async function () {
     let job = await Job.create(newJob);
@@ -55,14 +55,14 @@ describe("create", function () {
 
 /************************************** findAll */
 
-describe("create", function () {
+describe("findAll", function () {
   test("works", async () => {
     let jobs = await Job.findAll();
     expect(jobs.length).toEqual(2);
     await Job.create({
       title: "New",
       salary: 75000,
-      equity: "0.01",
+      equity: 0.01,
       company_handle: "c1"
     });
     jobs = await Job.findAll();
@@ -79,7 +79,7 @@ describe("get", function () {
     newJob = await Job.create({
       title: "New",
       salary: 75000,
-      equity: "0.01",
+      equity: 0.01,
       company_handle: "c1"
     });
   });
@@ -110,7 +110,7 @@ describe("update", function () {
   const updateData = {
     title: "Level II Developer",
     salary: 81500,
-    equity: "0.02"
+    equity: 0.02
   };
 
   beforeEach(async () => {
@@ -118,7 +118,7 @@ describe("update", function () {
     newJob = await Job.create({
       title: "New",
       salary: 75000,
-      equity: "0.01",
+      equity: 0.01,
       company_handle: "c1"
     });
   });
@@ -128,7 +128,9 @@ describe("update", function () {
     expect(company).toEqual({
       id: newJob.id,
       companyHandle: newJob.companyHandle,
-      ...updateData
+      title: "Level II Developer",
+      salary: 81500,
+      equity: "0.02"
     });
 
     const res = await db.query(
@@ -140,7 +142,9 @@ describe("update", function () {
     expect(res.rows[0]).toEqual({
       id: newJob.id,
       companyHandle: newJob.companyHandle,
-      ...updateData
+      title: "Level II Developer",
+      salary: 81500,
+      equity: "0.02"
     });
   });
 

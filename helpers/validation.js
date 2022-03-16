@@ -15,6 +15,11 @@ function preValidateProperty(object, key, schema, options, ctx) {
       object[key] = parseInt(value);
       return;
     }
+    // If the type is "boolean" but the instance is not a boolean, cast it
+    if (schema.type === "boolean" && typeof value !== "boolean") {
+      object[key] = value.toLowerCase() === "true";
+      return;
+    }
   }
 }
 

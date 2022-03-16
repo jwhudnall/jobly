@@ -111,7 +111,6 @@ router.patch("/:handle", ensureIsAdmin, async function (req, res, next) {
       throw new BadRequestError(errs);
     }
 
-    // debugger;
     const company = await Company.update(req.params.handle, req.body);
     return res.json({ company });
   } catch (err) {
