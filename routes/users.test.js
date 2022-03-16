@@ -5,6 +5,7 @@ const request = require("supertest");
 const db = require("../db.js");
 const app = require("../app");
 const User = require("../models/user");
+const Job = require("../models/job");
 
 const {
   commonBeforeAll,
@@ -19,6 +20,13 @@ beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
+
+const newJob = {
+  title: "New Job!",
+  salary: 95000,
+  equity: 0.02,
+  companyHandle: "c1"
+};
 
 /************************************** POST /users */
 
@@ -138,6 +146,55 @@ describe("POST /users", function () {
       })
       .set("authorization", `Bearer ${u4AdminToken}`);
     expect(resp.statusCode).toEqual(400);
+  });
+});
+
+/************************************** POST /users/:username/jobs/:id */
+
+describe("POST /users/:username/jobs/:id", function () {
+  let testJob;
+
+  beforeEach(async () => {
+    const adminJobRes = await request(app)
+      .post("/jobs")
+      .send(newJob)
+      .set("authorization", `Bearer ${u4AdminToken}`);
+    testJob = adminJobRes.body.job;
+  });
+
+  test("works for current user", async () => {
+    const resp = await request(app)
+      .post(`/users/u1/jobs/${testJob.id}`)
+      .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toBe(201);
+  });
+
+  test("works for admin", async () => {
+    const resp = await request(app)
+      .post(`/users/u1/jobs/${testJob.id}`)
+      .set("authorization", `Bearer ${u4AdminToken}`);
+    expect(resp.statusCode).toBe(201);
+  });
+
+  test("unauth for different user", async () => {
+    const resp = await request(app)
+      .post(`/users/u2/jobs/${testJob.id}`)
+      .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toBe(401);
+  });
+
+  test("404 error for invalid username", async () => {
+    const resp = await request(app)
+      .post(`/users/someone/jobs/${testJob.id}`)
+      .set("authorization", `Bearer ${u4AdminToken}`);
+    expect(resp.statusCode).toBe(404);
+  });
+
+  test("404 error for invalid job_id", async () => {
+    const resp = await request(app)
+      .post(`/users/u2/jobs/0`)
+      .set("authorization", `Bearer ${u4AdminToken}`);
+    expect(resp.statusCode).toBe(404);
   });
 });
 

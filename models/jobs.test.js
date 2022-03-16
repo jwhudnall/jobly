@@ -175,10 +175,6 @@ describe("remove", function () {
     jobLen = jobs.length;
   });
 
-  // afterEach(async () => {
-  //   await db.query("DELETE FROM jobs");
-  // });
-
   test("works", async () => {
     await Job.remove(exJob.id);
     const updatedJobs = await Job.findAll();

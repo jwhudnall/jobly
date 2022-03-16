@@ -56,7 +56,6 @@ function ensureIsAdmin(req, res, next) {
 }
 
 function currUserOrAdmin(req, res, next) {
-  // debugger;
   try {
     const noUser = res.locals.user === undefined;
     if (noUser || (res.locals.user.username !== req.params.username && !res.locals.user.isAdmin)) {

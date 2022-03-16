@@ -8,9 +8,11 @@ const express = require("express");
 const { ensureLoggedIn, ensureIsAdmin, currUserOrAdmin } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
+const Job = require("../models/job");
 const { createToken } = require("../helpers/tokens");
 const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require("../schemas/userUpdate.json");
+const { json } = require("express/lib/response");
 
 const router = express.Router();
 
@@ -108,6 +110,24 @@ router.delete("/:username", currUserOrAdmin, async function (req, res, next) {
   try {
     await User.remove(req.params.username);
     return res.json({ deleted: req.params.username });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** POST /[username/jobs/:id]  =>  { applied: jobId }
+ *
+ * Authorization required: currentUser or admin
+ **/
+
+router.post("/:username/jobs/:id", currUserOrAdmin, async function (req, res, next) {
+  try {
+    const [user, jobId] = await Promise.all([
+      User.get(req.params.username),
+      Job.get(req.params.id)
+    ]);
+    const job = await User.apply(user.username, jobId.id);
+    return res.status(201).json({ applied: job });
   } catch (err) {
     return next(err);
   }

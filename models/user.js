@@ -45,6 +45,43 @@ class User {
     throw new UnauthorizedError("Invalid username/password");
   }
 
+  /** Apply for a job. If valid username and job_id, a new 'applications' relationship will be created.
+   *
+   * Throws BadRequestError if application already exists.
+   * Throws NotFoundError is 'user' or 'jobId' not found.
+   *
+   * Returns { applied: jobId }
+   *
+   **/
+
+  static async apply(username, jobId) {
+    const duplicateCheck = await db.query(
+      `SELECT username, job_id
+          FROM applications
+          WHERE username=$1
+          AND job_id=$2`,
+      [username, jobId]
+    );
+    if (duplicateCheck.rows[0]) {
+      throw new BadRequestError(
+        `User '${username}' has already applied to job having id '${jobId}'`
+      );
+    }
+    const result = await db.query(
+      `INSERT INTO applications
+          (username, job_id)
+          VALUES ($1, $2)
+          RETURNING job_id AS "jobId"`,
+      [username, jobId]
+    );
+    if (!result.rows[0]) {
+      throw new BadRequestError("Bad username or job_id");
+    }
+
+    const job = result.rows[0];
+    return job.jobId;
+  }
+
   /** Register user with data.
    *
    * Returns { username, firstName, lastName, email, isAdmin }
