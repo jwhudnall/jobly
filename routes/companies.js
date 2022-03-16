@@ -77,8 +77,9 @@ router.get("/", async function (req, res, next) {
 });
 
 /** GET /[handle]  =>  { company }
+ * Gets company info via company_handle
  *
- *  Company is { handle, name, description, numEmployees, logoUrl, jobs }
+ *  returns: { company } where company is { handle, name, description, numEmployees, logoUrl, jobs }
  *   where jobs is [{ id, title, salary, equity }, ...]
  *
  * Authorization required: none
@@ -86,10 +87,11 @@ router.get("/", async function (req, res, next) {
 
 router.get("/:handle", async function (req, res, next) {
   try {
-    const company = await Company.get(req.params.handle);
-    const jobs = await Job.findByHandle(req.params.handle);
+    const [company, jobs] = await Promise.all([
+      Company.get(req.params.handle),
+      Job.findByHandle(req.params.handle)
+    ]);
     company.jobs = jobs;
-    debugger;
     return res.json({ company });
   } catch (err) {
     return next(err);
