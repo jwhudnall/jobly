@@ -12,6 +12,8 @@ To run the tests:
 
     jest -i
 
+![test suite](https://github.com/jwhudnall/jobly/blob/main/static/images/tests.png?raw=true)
+
 ## Authentication
 
 There are two levels of authentication:
@@ -33,9 +35,14 @@ After cloning the repo, you can interact with the API using Insomnia, Postman or
    - firstName (ex: "Test")
    - lastName (ex: "User")
    - email (ex: "noThankYou@gmail.com")
+
+![register account](https://github.com/jwhudnall/jobly/blob/main/static/images/register.png?raw=true)
+
 2. A successful `POST` will yield a `token`. Copy the token and add it as an `authorization` header value, as follows: `authorization: Bearer <yourTokenKey>`. While you're in the headers, set `Content-Type: application/json`.
 
    **Note: You must specify the Content-Type in the headers or you may receive inconsistent behavior.**
+
+![set headers](https://github.com/jwhudnall/jobly/blob/main/static/images/set-headers.png?raw=true)
 
 3. With the header values set as outlined above, you can now send requests to the following routes:
    - Companies
@@ -58,3 +65,5 @@ After cloning the repo, you can interact with the API using Insomnia, Postman or
      - `DELETE` : `/users/:username` (admin or user having `username`)
      - `POST` : `/users/:username/jobs/:id` (admin or user having `username`)
        - Lets user `username` "apply" to a job having job_id of `id`
+
+![search companies](https://github.com/jwhudnall/jobly/blob/main/static/images/search.png?raw=true)
