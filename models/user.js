@@ -122,14 +122,14 @@ class User {
     return user;
   }
 
-  /** Find all job ids related to each user within given 'usernames' array.
+  /** Find all job ids related to each user within the given 'usernames' array.
    *
    * usernames: Array of valid usernames
    * returns: Object of username:job Array Ids
    *          ex: {user1: [43, 55], user2: []}
    **/
 
-  static async findUserJobIds(usernames) {
+  static async findUsersJobs(usernames) {
     const jobData = {};
     for (let user of usernames) {
       const res = await db.query(
@@ -165,7 +165,7 @@ class User {
     );
     const users = result.rows;
     const usernames = users.map((u) => u.username);
-    const jobData = await User.findUserJobIds(usernames);
+    const jobData = await User.findUsersJobs(usernames);
 
     return result.rows.map((u) => ({
       username: u.username,
