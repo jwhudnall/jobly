@@ -198,7 +198,7 @@ describe("POST /users/:username/jobs/:id", function () {
   });
 });
 
-/************************************** GET /users */
+/************************************** GET /users (admin only) */
 
 describe("GET /users", function () {
   test("works for admins", async function () {
