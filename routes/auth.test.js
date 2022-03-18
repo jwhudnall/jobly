@@ -9,6 +9,8 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
+  u1Token,
+  u4AdminToken
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -20,53 +22,43 @@ afterAll(commonAfterAll);
 
 describe("POST /auth/token", function () {
   test("works", async function () {
-    const resp = await request(app)
-        .post("/auth/token")
-        .send({
-          username: "u1",
-          password: "password1",
-        });
+    const resp = await request(app).post("/auth/token").send({
+      username: "u1",
+      password: "password1"
+    });
     expect(resp.body).toEqual({
-      "token": expect.any(String),
+      token: expect.any(String)
     });
   });
 
   test("unauth with non-existent user", async function () {
-    const resp = await request(app)
-        .post("/auth/token")
-        .send({
-          username: "no-such-user",
-          password: "password1",
-        });
+    const resp = await request(app).post("/auth/token").send({
+      username: "no-such-user",
+      password: "password1"
+    });
     expect(resp.statusCode).toEqual(401);
   });
 
   test("unauth with wrong password", async function () {
-    const resp = await request(app)
-        .post("/auth/token")
-        .send({
-          username: "u1",
-          password: "nope",
-        });
+    const resp = await request(app).post("/auth/token").send({
+      username: "u1",
+      password: "nope"
+    });
     expect(resp.statusCode).toEqual(401);
   });
 
   test("bad request with missing data", async function () {
-    const resp = await request(app)
-        .post("/auth/token")
-        .send({
-          username: "u1",
-        });
+    const resp = await request(app).post("/auth/token").send({
+      username: "u1"
+    });
     expect(resp.statusCode).toEqual(400);
   });
 
   test("bad request with invalid data", async function () {
-    const resp = await request(app)
-        .post("/auth/token")
-        .send({
-          username: 42,
-          password: "above-is-a-number",
-        });
+    const resp = await request(app).post("/auth/token").send({
+      username: 42,
+      password: "above-is-a-number"
+    });
     expect(resp.statusCode).toEqual(400);
   });
 });
@@ -75,40 +67,42 @@ describe("POST /auth/token", function () {
 
 describe("POST /auth/register", function () {
   test("works for anon", async function () {
-    const resp = await request(app)
-        .post("/auth/register")
-        .send({
-          username: "new",
-          firstName: "first",
-          lastName: "last",
-          password: "password",
-          email: "new@email.com",
-        });
+    const resp = await request(app).post("/auth/register").send({
+      username: "new",
+      firstName: "first",
+      lastName: "last",
+      password: "password",
+      email: "new@email.com"
+    });
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({
-      "token": expect.any(String),
+      token: expect.any(String)
     });
+    // Verify user added to db
+    const usersRes = await request(app)
+      .get("/users")
+      .set("authorization", `Bearer ${u4AdminToken}`);
+    expect(usersRes.body.users.length).toBe(5);
   });
 
   test("bad request with missing fields", async function () {
-    const resp = await request(app)
-        .post("/auth/register")
-        .send({
-          username: "new",
-        });
+    const resp = await request(app).post("/auth/register").send({
+      username: "new"
+    });
     expect(resp.statusCode).toEqual(400);
   });
 
   test("bad request with invalid data", async function () {
-    const resp = await request(app)
-        .post("/auth/register")
-        .send({
-          username: "new",
-          firstName: "first",
-          lastName: "last",
-          password: "password",
-          email: "not-an-email",
-        });
+    const resp = await request(app).post("/auth/register").send({
+      username: "new",
+      firstName: "first",
+      lastName: "last",
+      password: "password",
+      email: "not-an-email"
+    });
     expect(resp.statusCode).toEqual(400);
+    expect(resp.body.error.message[0]).toBe(
+      'instance.email does not conform to the "email" format'
+    );
   });
 });
