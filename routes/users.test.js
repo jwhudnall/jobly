@@ -28,7 +28,7 @@ const newJob = {
   companyHandle: "c1"
 };
 
-/************************************** POST /users */
+/************************************** POST /users (admin only) */
 
 describe("POST /users", function () {
   test("works for admins: create non-admin", async function () {
@@ -41,6 +41,30 @@ describe("POST /users", function () {
         password: "password-new",
         email: "new@email.com",
         isAdmin: false
+      })
+      .set("authorization", `Bearer ${u4AdminToken}`);
+    expect(resp.statusCode).toEqual(201);
+    expect(resp.body).toEqual({
+      user: {
+        username: "u-new",
+        firstName: "First-new",
+        lastName: "Last-newL",
+        email: "new@email.com",
+        isAdmin: false
+      },
+      token: expect.any(String)
+    });
+  });
+
+  test("works for admins: create non-admin (isAdmin=false not explicitly stated)", async function () {
+    const resp = await request(app)
+      .post("/users")
+      .send({
+        username: "u-new",
+        firstName: "First-new",
+        lastName: "Last-newL",
+        password: "password-new",
+        email: "new@email.com"
       })
       .set("authorization", `Bearer ${u4AdminToken}`);
     expect(resp.statusCode).toEqual(201);

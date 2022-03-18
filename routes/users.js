@@ -22,6 +22,9 @@ const router = express.Router();
  * only for admin users to add new users. The new user being added can be an
  * admin.
  *
+ * Required: username, firstName, lastName, email, password
+ * Optional: isAdmin (defaults to false)
+ *
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, firstName, lastName, email, isAdmin }, token }
  *
