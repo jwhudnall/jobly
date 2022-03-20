@@ -39,7 +39,7 @@ async function commonBeforeAll() {
     `
   );
 }
-
+// "BEGIN" & "ROLLBACK" represent transaction blocks
 async function commonBeforeEach() {
   await db.query("BEGIN");
 }

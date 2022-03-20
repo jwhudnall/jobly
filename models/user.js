@@ -122,31 +122,6 @@ class User {
     return user;
   }
 
-  /** Find all job ids related to each user within the given 'usernames' array.
-   *
-   * usernames: Array of valid usernames
-   * returns: Object of username:job Array Ids
-   *          ex: {user1: [43, 55], user2: []}
-   **/
-
-  static async findUsersJobs(usernames) {
-    const jobData = {};
-    for (let user of usernames) {
-      const res = await db.query(
-        `SELECT job_id
-          FROM applications
-          WHERE username=$1`,
-        [user]
-      );
-      if (res.rows.length === 0) {
-        jobData[user] = [];
-      } else {
-        jobData[user] = res.rows.map((j) => j.job_id);
-      }
-    }
-    return jobData;
-  }
-
   /** Find all users.
    *
    * Returns [{ username, first_name, last_name, email, is_admin, jobs:[] }, ...]
@@ -155,26 +130,36 @@ class User {
 
   static async findAll() {
     const result = await db.query(
-      `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
-           FROM users
+      `SELECT u.username,
+                  u.first_name AS "firstName",
+                  u.last_name AS "lastName",
+                  u.email,
+                  u.is_admin AS "isAdmin",
+                  j.id AS "jobId"
+           FROM users AS "u"
+           LEFT JOIN applications AS "a"
+           ON u.username = a.username
+           LEFT JOIN jobs AS "j"
+           ON a.job_id = j.id
            ORDER BY username`
     );
     const users = result.rows;
-    const usernames = users.map((u) => u.username);
-    const jobData = await User.findUsersJobs(usernames);
 
-    return result.rows.map((u) => ({
-      username: u.username,
-      firstName: u.firstName,
-      lastName: u.lastName,
-      email: u.email,
-      isAdmin: u.isAdmin,
-      jobs: jobData[u.username]
-    }));
+    const usersJobs = users.reduce((acc, next) => {
+      const userIdx = acc.findIndex((el) => el.username === next.username);
+      if (userIdx === -1) {
+        const { username, firstName, lastName, email, isAdmin } = next;
+        const user = { username, firstName, lastName, email, isAdmin };
+        user.jobs = next.jobId ? [next.jobId] : [];
+        acc.push(user);
+      } else if (next.jobId) {
+        const user = acc.find((u) => u.username === next.username);
+        user.jobs.push(next.jobId);
+      }
+      return acc;
+    }, []);
+
+    return usersJobs;
   }
 
   /** Given a username, return data about user.
